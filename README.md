@@ -1,5 +1,6 @@
 # multilayer-networks
- Drawing and analyzing multilayer networks in R
+
+Drawing and analyzing multilayer networks in R
 
 Ecological Synthesis Lab (SintECO): https://marcomellolab.wordpress.com
 
@@ -7,9 +8,7 @@ Authors: Marco Mello & Renata Muylaert
 
 E-mail: marmello@gmail.com 
 
-Script: Drawing and analyzing multilayer networks in R
-
-How to cite: Mello MAR & Muylaert RL. 2017. Script for drawing and analyzing multilayer networks in R. Available at https://marcomellolab.wordpress.com.
+How to cite: Mello MAR & Muylaert RL. 2017. Drawing and analyzing multilayer networks in R. Ecological Synthesis Lab at the University of São Paulo, Brazil.
 
 Published on November 23rd, 2017 (English version).
  
