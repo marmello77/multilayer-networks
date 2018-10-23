@@ -6,7 +6,7 @@ Authors: Marco Mello & Renata Muylaert
 
 E-mail: marmello@gmail.com 
 
-How to cite: Mello MAR & Muylaert RL. 2017. Drawing and analyzing multilayer networks in R. Ecological Synthesis Lab at the University of São Paulo, Brazil.
+How to cite: Mello MAR & Muylaert RL. 2017. Drawing and analyzing multilayer networks in R. Ecological Synthesis Lab of the University of São Paulo, Brazil.
 
 Published on November 23rd, 2017 (English version).
  
