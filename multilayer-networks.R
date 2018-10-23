@@ -35,8 +35,6 @@
 
 #### Step 1 ####
 # Set the working directory automatically to the source file location 
-
-library(rstudioapi) # load it
 current_path <- getActiveDocumentContext()$path 
 setwd(dirname(current_path ))
 print( getwd() )
@@ -53,6 +51,7 @@ library("network")
 library("png")
 library("plyr")
 library("reshape2")
+library("rstudioapi")
 
 
 #### Step 3 ####
