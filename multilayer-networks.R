@@ -34,9 +34,13 @@
 
 
 #### Step 1 ####
-# Set the working directory
+# Set the working directory automatically to the source file location 
 
-setwd("path to the folder where the script is")
+library(rstudioapi) # load it
+current_path <- getActiveDocumentContext()$path 
+setwd(dirname(current_path ))
+print( getwd() )
+
 
 #### Step 2 ####
 # Clear all objects and load the required packages
