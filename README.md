@@ -10,7 +10,7 @@ How to cite: Mello MAR & Muylaert RL. 2017. Drawing and analyzing multilayer net
 
 Published on November 23rd, 2017 (English version).
 
-https://zenodo.org/badge/DOI/10.5281/zenodo.1487539.svg
+<a href="https://doi.org/10.5281/zenodo.1487539"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.1487539.svg" alt="DOI"></a>
 
  
 Run in R 3.4.2 (2017-09-28) -- "Short Summer"
