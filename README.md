@@ -9,6 +9,9 @@ E-mail: marmello@gmail.com
 How to cite: Mello MAR & Muylaert RL. 2017. Drawing and analyzing multilayer networks in R. Ecological Synthesis Lab of the University of São Paulo, Brazil.
 
 Published on November 23rd, 2017 (English version).
+
+https://zenodo.org/badge/DOI/10.5281/zenodo.1487539.svg
+
  
 Run in R 3.4.2 (2017-09-28) -- "Short Summer"
 
