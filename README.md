@@ -1,4 +1,4 @@
-# Drawing and analyzing multilayer networks in R
+# How to draw and analyze multilayer networks in R
 
 Ecological Synthesis Lab (SintECO): https://marcomellolab.wordpress.com
 
