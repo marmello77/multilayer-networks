@@ -1,300 +1,326 @@
-####################################################################
-#####                                                           ####
-##### SCRIPT FOR DRAWING AND ANALYZING MULTILAYER NETWORKS IN R ####
-#####                                                           ####       
-####################################################################
+################################################################################
+##### A tutorial on how to draw and analyze multilayer networks in R.
+##### Ecological Synthesis Lab (SintECO).
+##### https://marcomellolab.wordpress.com.
+##### Authors: Marco Mello & Renata Muylaert.
+##### E-mail: marmello@usp.br. 
+##### See README for further info.
+##### https://github.com/marmello77/multilayer-networks/blob/master/README.md
+################################################################################
 
 
-##### Ecological Synthesis Lab (SintECO)
-##### https://marcomellolab.wordpress.com
-##### Authors: Marco Mello & Renata Muylaert
-##### E-mail: marmello@gmail.com 
-##### Script: Drawing and analyzing multilayer networks in R
-##### How to cite: Mello MAR & Muylaert RL. 2017. Script for drawing and analyzing
-##### multilayer networks in R. Available at https://marcomellolab.wordpress.com.
-##### Published on November 23rd, 2017 (English version).
-##### Run in R 3.4.2 (2017-09-28) -- "Short Summer"
-
-##### Disclaimer: You may use this script freely for non-comercial
-##### purposes at your own risk. We assume no responsibility or
-##### liability for the use of this software, convey no license
-##### or title under any patent, copyright, or mask work right
-##### to the product. We reserve the right to make changes in
-##### the software without notification. 
-##### We also make no representation or warranty that such
-##### application will be suitable for the specified use without
-##### further testing or modification.
-
-##### Obs: If this script helps you produce any academic work
-##### (paper, book, chapter, dissertation etc.), please
-##### acknowledge the authors and cite the source.
+################################################################################
+##### SUMMARY
+################################################################################
 
 
-#############################################
+# 1. Get ready
+# 2. Attention
+# 3. Starting with incidence matrices
+# 4. Starting with vertex and edge lists
+# 5. Draw the network
 
 
-#### Step 1 ####
+################################################################################
+##### 1. Get ready
+################################################################################
+
+
+# Warning: 
+
+# There is no single magic way to draw all kinds of networks. 
+# There are several network drawing algorithms implemented in different
+# R packages and stand-alone software. Study their logic and algorithms, 
+# see some papers in which they were used. Think it through, and only 
+# then decide which drawing method to use in your study. For guidelines
+# on which drawing algorithm to choose, see the suggested readings.
+
+# The elements of a network may be called nodes or vertices. Depending on the
+# software or package used, you'll see one term or the other.
+
+# The relationships between the elements of a network may be called links or
+# edges. Depending on the software or package used, you'll see one term or
+# the other.
+
+##############################
+
 # Set the working directory automatically to the source file location 
-current_path <- getActiveDocumentContext()$path 
-setwd(dirname(current_path ))
-print( getwd() )
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+# Remove all previous objects
+rm(list= ls())
+
+# Load the required packages
+library(bipartite)
+library(dplyr)
+library(igraph)
+library(reshape2)
+library(tidyverse)
 
 
-#### Step 2 ####
-# Clear all objects and load the required packages
-
-rm(list=ls())
-library("igraph")
-library("bipartite")
-library("ggplot2")
-library("network") 
-library("png")
-library("plyr")
-library("reshape2")
-library("rstudioapi")
+################################################################################
+##### 2. Attention
+################################################################################
 
 
-#### Step 3 ####
-# Example file: two adjacency matrices: antagonistic and mutualistic
-# interactions between small mammals and plants in an urban protected
-# area in Brazil (Genrich et al 2017, Oikos:
-# http://dx.doi.org/10.1111/oik.03825)
-# NOTE ABOUT THE INPUT FILES
-# How are your INPUT data formatted: edge list or adjacency matrix?
-# You need to know it, before choosing the data import 
-# method (1 or 2).
-# Method 1 will save multilayer network as the object multilayer1
-# Method 2 will save multilayer network as the object multilayer2
-# Method 2 is preferable, as you can import a file in which you 
-# can include all the addtional data you want (e.g., species
-# traits) in the node and edge lists.
+# The best way to work with multilayer networks is by using vertex and edge
+# lists, because you can easily add several attributes to those lists and
+# input them directly in R.
 
-#### METHOD 1 ####
-# Import the data, method 1: from adjacency matrices
+# However, in most cases, ecologists organize their interaction data as
+# incidence matrices (AxB), in which the rows represent one class of vertices
+# and the columns represent the other class. Those classes may represent
+# pollinators and plants, for instance.
 
-# Using the example files provided with this script
-antagonistic <- read.table("antagonistic.txt", head=TRUE)
-class(antagonistic)
-mutualistic <- read.table("mutualistic.txt", head=TRUE)
-class(mutualistic)
+# If your data are organized as incidence matrices, go to section 3.
 
-# Check the data O^O
-antagonistic 
-mutualistic
-
-# Transform the bipartite matrices into edge lists
-
-### Layer 1: antagonistic
-antagonistic2 = cbind.data.frame(reference=row.names(antagonistic),antagonistic)
-str(antagonistic2)
-antagonistic_list = melt(antagonistic2, na.rm = T)
-colnames(antagonistic_list) = c("animals", "plants", "weight")
-antagonistic_list[,1]=as.character(paste(antagonistic_list[,1]))
-antagonistic_list[,2]=as.character(paste(antagonistic_list[,2]))
-head(antagonistic_list)
-
-# Exclude all edges with value 0 (zero)
-antagonistic_list2 <- subset(antagonistic_list, weight > 0)
-head(antagonistic_list2)
-
-# Create the edge list
-links_ant = antagonistic_list2
-head(links_ant)
-
-# Creata the node list of the antagonistic layer
-nodes_ant <- unique(data.frame(nodes = c(antagonistic_list2[,1], antagonistic_list2[,2])))
-head(nodes_ant)
-
-# Check the dimensions of the node list
-dim(nodes_ant[1])
-
-# Create a new column in the node list to tell which
-# nodes are the animals and the plants
-# They are the rows and columns of the original matrix
-nodes_ant$taxon = c((rep("Animal",8)), rep("Plant", 33)) 
-head(nodes_ant)
-
-# Create an igraph object based on the node and edge lists
-antagonistic3 <- graph_from_data_frame(d=links_ant, vertices=nodes_ant, directed=F) 
-class(antagonistic3)
-str(antagonistic3)
-head(antagonistic3)
-antagonistic3
-
-#Add information on the two-mode strucutre
-V(antagonistic3)$type <- V(antagonistic3)$name %in% links_ant[,1]
-V(antagonistic3)$type = nodes_ant[,2]
-antagonistic3
-
-# Create a column in the edge for the layers
-# In the example file, the layers are interaction types
-antagonistic_list2$layer = "antagonistic"
-
-### Layer 2: mutualistic
-mutualistic2 = cbind.data.frame(reference=row.names(mutualistic),mutualistic)
-str(mutualistic2)
-mutualistic_list = melt(mutualistic2, na.rm = T)
-colnames(mutualistic_list) = c("animals", "plants", "weight")
-mutualistic_list[,1]=as.character(paste(mutualistic_list[,1]))
-mutualistic_list[,2]=as.character(paste(mutualistic_list[,2]))
-head(mutualistic_list)
-
-# Exclude all edges with value 0 (zero)
-mutualistic_list2 <- subset(mutualistic_list, weight > 0)
-head(mutualistic_list2)
-
-# Create the edge list
-links_mut = mutualistic_list2
-head(links_mut)
-
-# Creata the node list of the mutualistic layer
-nodes_mut <- unique(data.frame(nodes = c(mutualistic_list2[,1], mutualistic_list2[,2])))
-head(nodes_mut)
-
-# Check the dimensions of the node list
-dim(nodes_mut[1])
-
-# Create a new column in the node list to tell which
-# nodes are the animals and the plants
-# They are the rows and columns of the original matrix
-nodes_mut$taxon = c((rep("Animal",8)), rep("Plant", 20)) 
-head(nodes_mut)
-
-# Create an igraph object based on the node and edge lists
-mutualistic3 <- graph_from_data_frame(d=links_mut, vertices=nodes_mut, directed=F) 
-class(mutualistic3)
-str(mutualistic3)
-head(mutualistic3)
-mutualistic3
-
-#Add information on the two-mode strucutre
-V(mutualistic3)$type <- V(mutualistic3)$name %in% links_mut[,1]
-V(mutualistic3)$type = nodes_mut[,2]
-mutualistic3
-
-# Create a column in the edge for the layers
-# In the example file, the layers are interaction types
-mutualistic_list2$layer = "mutualistic"
-
-### Bind the layers and build the multilayer network
-links1 = rbind(antagonistic_list2, mutualistic_list2)
-nodes1 = rbind(nodes_ant, nodes_mut)
-nodes1 = unique(nodes1)
-dim(nodes1)
-multilayer1 <- graph_from_data_frame(d=links1, vertices=nodes1, directed=F) 
-class(multilayer1)
-head(multilayer1)
-multilayer1
-
-write.table(links1, "links1.txt", sep="\t", quote=F, row.names = FALSE)
-write.table(nodes1, "nodes1.txt", sep="\t", quote=F, row.names = FALSE)
-
-#### METHOD 2 ####
-# Import the data, method 2: from edge and node lists
-# Import vertices (nodes) and edges (links) that you already have in
-# your working directory 
-# You may create those lists with as many additional data as
-# you want. Or you may just use the files exported using
-# the method 1
-
-links2 = read.table("links1.txt", header= TRUE, sep="\t")
-nodes2 = read.table("nodes1.txt", header= TRUE, sep="\t")
-
-head(links2)
-head(nodes2)
-
-# Create the multilayer network based on the node and link lists
-multilayer2 <- graph_from_data_frame(d=links2, vertices=nodes2, directed=T) 
-
-# Notice that, using the example files, the two multilayer
-# networks are actually the same
-str(multilayer2)
-str(multilayer1)
-
-# So you may work with either of the two networks in
-# the following steps
-# multilayer1 <- multilayer2
+# Otherwise, if your data are organized as edge and vertex lists, go to
+# section 4.
 
 
-#### Step 4: Drawing ####
+################################################################################
+##### 3. Starting with incidence matrices
+################################################################################
 
 
-# Draw the graph with node colors by taxon
-# Data from the example file (import using method 1)
+# OK, we are going to work with a multilayer network (net1) composed of two
+# layers: one with antagonistic interactions and the other with mutualistic 
+# interactions. These layers are represented by two matrices with equal
+# dimensions and exactly the same label order for rows and columns. This
+# kind of multilayer network is known as multiplex network, as all vertices
+# are represented in all layers, and are connected to their counterparts
+# through interlayer edges.
 
-# Choose the drawing method (layout) and save it as an object 
-l <- layout_nicely(multilayer1)
+#Import the data in matrix format, ready to be used with bipartite
+net1an_bi <- as.matrix(read.delim("data/net1an.txt", row.names=1))
+net1mu_bi <- as.matrix(read.delim("data/net1mu.txt", row.names=1))
 
-#If the nodes are overlapping, try expanding the graph
-my.layout <- layout_with_fr(multilayer1)
-my.layout <- norm_coords(my.layout, ymin=-1, ymax=1, xmin=-1, xmax=1)
-plot(multilayer1, rescale=F, layout=my.layout*3)
+#Inspect the incidence matrices
+class(net1an_bi)
+dim(net1an_bi)
+min(net1an_bi)
+max(net1an_bi)
 
-# Set node colors by taxon
-V(multilayer1)$color = nodes1$taxon
-V(multilayer1)$color = gsub("Animal","#E6B246",V(multilayer1)$color)
-V(multilayer1)$color = gsub("Plant","#A3D642",V(multilayer1)$color)
+class(net1mu_bi)
+dim(net1mu_bi)
+min(net1mu_bi)
+max(net1mu_bi)
 
-#Set link colors by layer
-E(multilayer1)$color = links1$layer
-E(multilayer1)$color = gsub("antagonistic","#D05B9B",E(multilayer1)$color)
-E(multilayer1)$color = gsub("mutualistic","#5770AE",E(multilayer1)$color)
+# Let's take a closer look at these matrices. See that they are like 
+# reflections in a mirror, but with different values in their cells.
 
-# Transform arcs into edges
-E(multilayer1)$arrow.mode = 0
+# Antagonistic matrix:
+net1an_bi
 
-# Export the graph as a PNG image
-# CAUTION: study the plotting parameters, so you can
-# customize your own graph
-plot.new()
+# Mutualistic matrix:
+net1mu_bi
 
-png(filename= "multilayer_example.png", res= 300, height= 3000, width= 4700)
-par(mfrow=c(1,1),mar=c(1,1,3,17))
-#Use a function for avoiding overlap between edges of different layers in the graph
-curves = curve_multiple(multilayer1)
-plot(multilayer1, 
-     vertex.color = V(multilayer1)$color, 
-     vertex.frame.color= V(multilayer1)$color, 
-     vertex.shape = V(multilayer1)$shape, 
-     vertex.size=10,
-     vertex.label=V(multilayer1)$name,
-     vertex.label.color="white",
-     vertex.label.cex=.5,
-     edge.color = E(multilayer1)$color, 
-     edge.width = E(multilayer1)$weight/2,
-     edge.curved=curves, 
-     layout=l)
+#Transform these matrices into graphs formatted for igraph
+net1an_ig <- graph_from_incidence_matrix(net1an_bi, directed = F, weighted = TRUE) 
+net1mu_ig <- graph_from_incidence_matrix(net1mu_bi, directed = F, weighted = TRUE) 
 
-# Create a legend for the plot 
-legend(x = 1.3,y = 0.9, legend = c("Animals", "Plants"), 
-       pch = c(15,16),  title="Taxa", 
-       text.col = "gray20", title.col = "black", box.lwd = 0,
-       cex = 2, col=c("#E6B246", "#A3D642"))
-legend(x = 1.3,y = 0.1, legend = c("Antagonistic", "Mutualistic"),
-       fill = c("#D05B9B", "#5770AE"), 
-       title="Interaction types (layers)",
-       text.col = "gray20", title.col = "black", box.lwd = 0, cex = 2)
-title(main = "Plant-frugivore multilayer network", cex.main=2)
-par(mfrow=c(1,1))
+#Inspect the graphs
+class(net1an_ig)
+net1an_ig
+attributes(E(net1an_ig))
+attributes(V(net1an_ig))
+
+class(net1mu_ig)
+net1mu_ig
+attributes(E(net1mu_ig))
+attributes(V(net1mu_ig))
+
+# At this point, you could work already with the matrices in the package
+# bipartite or with the graphs in the package igraph. Nevertheless, you
+# would be working with separate layers, not with a true multilayer network.
+# Let's work on combining these layers.
+
+#Transform the matrices into a combined edge list
+net1list <- bind_rows(
+        as.data.frame(as.table(net1an_bi)),
+        as.data.frame(as.table(net1mu_bi)),
+        .id = "layer") %>%
+        
+        filter(Freq != 0) %>%
+        select(
+                from = Var1,
+                to = Var2,
+                layer,
+                Freq)
+
+#Check the data
+head(net1list)
+
+#Give the columns informative names
+colnames(net1list) <- c("animals", "plants", "layer", "weight")
+
+#Check the data
+head(net1list)
+
+#Transform the combined edge list into an igraph object
+net1_multi <- graph_from_data_frame(net1list, directed = FALSE)
+
+#Check the multilayer network
+net1_multi
+attributes(V(net1_multi))
+attributes(E(net1_multi))
+V(net1_multi)$name
+V(net1_multi)$taxon
+V(net1_multi)$type
+E(net1_multi)$layer
+E(net1_multi)$weight
+
+# Create a new edge attribute with info on interaction types (layers)
+E(net1_multi)$layer <- ifelse(E(net1_multi)$layer == "1",
+                              "antagonistic",
+                              "mutualistic")
+
+# Check the layers
+E(net1_multi)$layer
+
+# Add information on the bipartite structure by assigning vertex classes
+V(net1_multi)$type = c(rep(0, nrow(net1an_bi)), 
+                       rep(1, ncol(net1an_bi)))
+
+# Check the network's attributes and the vertex classes
+net1_multi
+V(net1_multi)$type
+
+# This network contains 3 taxonomic groups: marsupials, rodents, and plants.
+# So let's recover this information now.
+# Create a new vertex attribute with the taxonomic groups
+V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Marsupials",
+                          "Marsupials", "Rodents", "Rodents", "Marsupials",
+                          "Rodents"),
+                        rep("Plants", ncol(net1an_bi)))
+
+# Check the taxonomic groups
+V(net1_multi)$taxon
+
+
+# Congrats!
+# Now you can skip to step 5 and draw the network.
+
+
+################################################################################
+##### 4. Starting with vertex and edge lists
+################################################################################
+
+
+# We are going to work with the same network (net1) as in section 3. But here
+# we assume that the data are organized as edge and vertex lists. You'll see
+# that working with this format is much, much easier. Seriously easier.
+# Furthermore, lists are consistent with the "tidy data format", which is
+# much better for management and analysis. Read this manifesto:
+# https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html
+
+# Import the edge and vertex lists
+nodes = read.delim("data/net1nodes.txt", header = T)
+links = read.delim("data/net1links.txt", header = T)
+
+# Let's take a look of those objects. See that, in addition to the core data
+# (i.e., the nodes and the links), they contain attributes. That's a huge
+# advantage of the list format: you can include as many edge and vertex
+# attributes as you want in your lists. Those attributes can then be easily
+# correlated with the strictu sensu network information.
+head(nodes)
+head(links)
+
+#Create the multilayer network by combining the lists as an igraph object
+net1_multi <- graph_from_data_frame(d=links, vertices=nodes, directed=T) 
+
+#Check the multilayer network
+net1_multi
+attributes(V(net1_multi))
+attributes(E(net1_multi))
+V(net1_multi)$name
+V(net1_multi)$taxon
+V(net1_multi)$type
+E(net1_multi)$layer
+E(net1_multi)$weight
+
+# Convert the graph to undirected
+net1_multi <- as.undirected(net1_multi, mode = "each")
+
+#Check the multilayer network 
+net1_multi
+
+# Add information on the bipartite structure by assigning vertex classes (type)
+V(net1_multi)$type <- c(rep(0, length(which(nodes$taxon=="Animal"))),
+                        rep(1, length(which(nodes$taxon=="Plant"))))
+
+# Check the network's attributes and the vertex classes
+net1_multi
+V(net1_multi)$type
+
+# This network contains 3 taxonomic groups: marsupials, rodents, and plants.
+# So let's recover this information now.
+# Create a new vertex attribute with the taxonomic groups
+V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Marsupials",
+                          "Marsupials", "Rodents", "Rodents", "Marsupials",
+                          "Rodents"),
+                        rep("Plants", ncol(net1an_bi)))
+
+# Check the taxonomic groups
+V(net1_multi)$taxon
+
+# Congrats!
+# Now you can go to step 5 and draw the network.
+
+
+################################################################################
+##### 5. Draw the network
+################################################################################
+
+
+# Either if you started with incidence matrices or with edge and vertex lists,
+# now you have an object named "net1_multi". We are going to just do some 
+# adjustments, so the graph looks better and is more informative when
+# plotted.
+
+
+# Set vertex colors by taxonomic group
+V(net1_multi)$color = V(net1_multi)$taxon
+V(net1_multi)$color = gsub("Marsupials","gold",V(net1_multi)$color)
+V(net1_multi)$color = gsub("Rodents","purple",V(net1_multi)$color)
+V(net1_multi)$color = gsub("Plants","darkgreen",V(net1_multi)$color)
+
+# Check vertex colors
+V(net1_multi)$color
+
+# Set edge colors by layer
+E(net1_multi)$color = E(net1_multi)$layer
+E(net1_multi)$color = gsub("antagonistic", "red",E(net1_multi)$color)
+E(net1_multi)$color = gsub("mutualistic","blue",E(net1_multi)$color)
+
+# Check edge colors
+E(net1_multi)$color
+
+# Adjust a function to set edge curvatures, so the edges do not overlap
+curves = curve_multiple(net1_multi)
+
+# Plot the network as an energy--minimization graph and
+# export the output as a PNG image
+png(filename= "figures/net1.png", #name the file
+    units = "px", #set the units to pixels
+    res= 300, #set the resolution in dpi (most journals require at least 300)
+    height= 3000, width= 3000) #set the dimensions in the chosen unit
+
+plot(net1_multi, #the network you want to plot
+     layout = layout_nicely, #choose a drawing layout for the graph
+     vertex.shape = "circle", #choose a vertex shape
+     vertex.size = 8, #set vertex size
+     vertex.color = V(net1_multi)$color, #set vertex colors
+     vertex.frame.color = NA, #set vertex border color
+     vertex.label.cex = 0.5, #set vertex label size
+     vertex.label.color = "white", #set vertex label color
+     edge.width = E(net1_multi)$weight/2, #set edge width and adjust it
+     edge.color = adjustcolor(E(net1_multi)$color, alpha = 0.3), #set edge color
+     edge.curved = curves) #set edge curvature
+# You can set many other arguments. Check this function's help
 
 dev.off()
 
 
-#### Suggested readings ####
+#################################### END #######################################
 
-
-# Boccaletti S, Bianconi G, Criado R, et al (2014) The structure and dynamics of multilayer networks. Phys Rep 544:1–122. doi: 10.1016/j.physrep.2014.07.001
-
-# Costa F V., Mello MAR, Bronstein JL, et al (2016) Few Ant Species Play a Central Role Linking Different Plant Resources in a Network in Rupestrian Grasslands. PLoS One 11:e0167161. doi: 10.1371/journal.pone.0167161
-
-# Cozzo E, Arruda GF, Rodrigues FA, Moreno Y (2016) Multilayer networks: metrics and spectral properties. In: Garas A (ed) Interconnected networks. Springer International Publishing, Cham, pp 17–35
-
-# Genrich CM, Mello MAR, Silveira FAO, et al (2017) Duality of interaction outcomes in a plant-frugivore multilayer network. Oikos 126:361–368. doi: 10.1111/oik.03825
-
-# Kivela M, Arenas A, Barthelemy M, et al (2014) Multilayer networks. J Complex Networks 2:203–271. doi: 10.1093/comnet/cnu016
-
-# Kefi S, Miele V, Wieters EA, et al (2016) How Structured Is the Entangled Bank? The Surprisingly Simple Organization of Multiplex Ecological Networks Leads to Increased Persistence and Resilience. PLOS Biol 14:e1002527. doi: 10.1371/journal.pbio.1002527
-
-# Pilosof S, Porter MA, Pascual M, Kefi S (2017) The multilayer nature of ecological networks. Nat Ecol Evol 1:101. doi: 10.1038/s41559-017-0101
-
-# Pocock MJO, Evans DM, Fontaine C, et al (2016) The Visualisation of Ecological Networks, and Their Use as a Tool for Engagement, Advocacy and Management. In: Woodward G, Bohan DA (eds) Advances in Ecological Research, 1st edn. Academic Press, Cambridge, pp 41–85
