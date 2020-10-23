@@ -39,7 +39,7 @@ The first version of this script was written as part of the analysis carried out
 
 2. figures (folder)
 
-    a.net1.png -> multilayer graph of net1.
+    a. net1.png -> multilayer graph of net1.
     
 
 3. multilayer-networks -> script to draw and analyze multilayer networks.
