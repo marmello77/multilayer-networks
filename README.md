@@ -71,6 +71,8 @@ We thank our labmates and our sponsors, especially the Alexander von Humboldt-St
 
 * Bianconi, G. (2018). [Multilayer Networks: Structure and Function](https://amzn.to/31SAdRl). (1st ed.). Oxford: Oxford University Press.
 
+* Marai, G. E., B. Pinaud, K. Bühler, A. Lex, and J. H. Morris. (2019) [Ten simple rules to create biological network figures for communication](https://doi.org/10.1371/journal.pcbi.1007244). PLOS Comput. Biol. 15: e1007244.
+
 * Mello MAR, Muylaert RL, Pinheiro RBP & Félix GMF. 2016. [Guia para análise de redes ecológicas](https://marcomellolab.wordpress.com/software/). Edição dos autores, Belo Horizonte. 112 p. ISBN-13: 978-85-921757-0-2.
 
 * Mello, M. A. R., Felix, G. M., Pinheiro, R. B. P., Muylaert, R. L., Geiselman, C., Santana, S. E., … Stevens, R. D. (2019). [Insights into the assembly rules of a continent-wide multilayer network](https://doi.org/10.1038/s41559-019-1002-3). Nature Ecology & Evolution, 3(11), 1525–1532.
@@ -78,3 +80,6 @@ We thank our labmates and our sponsors, especially the Alexander von Humboldt-St
 * Ognyanova K. 2019. [Static and dynamic network visualization with R](http://kateto.net/network-visualization).
 
 * Pilosof, S., Porter, M. A., Pascual, M., & Kéfi, S. (2017). [The multilayer nature of ecological networks](https://doi.org/10.1038/s41559-017-0101). Nature Ecology & Evolution, 1(4), 0101.
+
+* Pocock, M. J. O., D. M. Evans, C. Fontaine, M. Harvey, R. Julliard, Ó. McLaughlin, J. Silvertown, A. Tamaddoni-Nezhad, P. C. L. White, and D. A. Bohan. (2016) [The Visualisation of Ecological Networks, and Their Use as a Tool for Engagement, Advocacy and Management](http://linkinghub.elsevier.com/retrieve/pii/S0065250415000355). In G. Woodward and D. A. Bohan (Eds.) Advances in Ecological Research. pp. 41–85, Academic Press, Cambridge.
+
