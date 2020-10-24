@@ -227,7 +227,7 @@ head(nodes)
 head(links)
 
 #Create the multilayer network by combining the lists as an igraph object
-net1_multi <- graph_from_data_frame(d=links, vertices=nodes, directed=T) 
+net1_multi <- graph_from_data_frame(d=links, vertices=nodes, directed=F) 
 
 #Check the multilayer network
 net1_multi
@@ -238,9 +238,6 @@ V(net1_multi)$taxon
 V(net1_multi)$type
 E(net1_multi)$layer
 E(net1_multi)$weight
-
-# Convert the graph to undirected
-net1_multi <- as.undirected(net1_multi, mode = "each")
 
 #Check the multilayer network 
 net1_multi
