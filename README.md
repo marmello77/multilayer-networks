@@ -1,6 +1,6 @@
 # multilayer-networks
 
-A tutorial on how to draw and analyze multilayer networks in R.
+A tutorial on how to draw multilayer networks in R.
 
 [Ecological Synthesis Lab](https://marcomellolab.wordpress.com) (SintECO).
 
