@@ -189,10 +189,10 @@ V(net1_multi)$type
 # This network contains 3 taxonomic groups: marsupials, rodents, and plants.
 # So let's recover this information now.
 # Create a new vertex attribute with the taxonomic groups
-V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Marsupials",
-                          "Marsupials", "Rodents", "Rodents", "Marsupials",
-                          "Rodents"),
-                        rep("Plants", ncol(net1an_bi)))
+V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Rodents",
+                          "Marsupials", "Rodents", "Marsupials", "Marsupials",
+                          "Marsupials"),
+                        rep("Plants", length(which(nodes$taxon=="Plant"))))
 
 # Check the taxonomic groups
 V(net1_multi)$taxon
@@ -253,10 +253,10 @@ V(net1_multi)$type
 # This network contains 3 taxonomic groups: marsupials, rodents, and plants.
 # So let's recover this information now.
 # Create a new vertex attribute with the taxonomic groups
-V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Marsupials",
-                          "Marsupials", "Rodents", "Rodents", "Marsupials",
-                          "Rodents"),
-                        rep("Plants", ncol(net1an_bi)))
+V(net1_multi)$taxon = c(c("Rodents", "Rodents", "Marsupials", "Rodents",
+                          "Marsupials", "Rodents", "Marsupials", "Marsupials",
+                          "Marsupials"),
+                        rep("Plants", length(which(nodes$taxon=="Plant"))))
 
 # Check the taxonomic groups
 V(net1_multi)$taxon
