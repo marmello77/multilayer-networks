@@ -67,6 +67,8 @@ We thank our labmates and our sponsors, especially the Alexander von Humboldt-St
 
 ## Suggested readings
 
+If you want to understand the theory behind our script, read the following works:
+
 * Barabasi, A.L. (2016) [Network Science](http://barabasi.com/networksciencebook/), 1st ed. Cambridge University Press, Cambridge.
 
 * Bianconi, G. (2018). [Multilayer Networks: Structure and Function](https://amzn.to/31SAdRl). (1st ed.). Oxford: Oxford University Press.
